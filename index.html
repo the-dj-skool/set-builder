@@ -667,7 +667,8 @@ function startChat() {
   messages = [{ role: 'assistant', content: OPENING_MESSAGE }];
   renderMessage('assistant', OPENING_MESSAGE);
   stage = 'q1';
-  inputEl.focus();
+  // Don't auto-focus on mobile — let user tap input when ready
+  if (window.innerWidth > 768) inputEl.focus();
 }
 
 async function sendMessage() {
