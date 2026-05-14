@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DJ Skool Set Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #080810;
+    color: rgba(255,255,255,0.85);
+    font-family: 'Space Mono', monospace;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  #landing {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .grid-lines {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+
+  .orb {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f5a623, #e94560);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 50px rgba(245,166,35,0.45);
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+    animation: orbPulse 3s ease-in-out infinite;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .orb-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    line-height: 1;
+    padding: 6px;
+  }
+
+  .orb-logo span {
+    font-family: 'Bebas Neue', sans-serif;
+    color: #ffffff;
+    display: block;
+    letter-spacing: 1px;
+  }
+
+  .orb-logo .the   { font-size: 13px; }
+  .orb-logo .dj    { font-size: 20px; }
+  .orb-logo .skool { font-size: 13px; }
+
+  @keyframes orbPulse {
+    0%, 100% { box-shadow: 0 0 50px rgba(245,166,35,0.45); }
+    50%       { box-shadow: 0 0 70px rgba(245,166,35,0.65); }
+  }
+
+  .eyebrow {
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: rgba(255,255,255,0.35);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .headline {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(32px, 7vw, 52px);
+    font-weight: normal;
+    color: #ffffff;
+    line-height: 1.15;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .sub {
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+    max-width: 320px;
+    line-height: 1.8;
+    margin-bottom: 36px;
+    position: relative;
+    z-index: 1;
+  }
+
+  #start-btn {
+    background: linear-gradient(135deg, #f5a623, #e94560);
+    border: none;
+    border-radius: 50px;
+    padding: 18px 48px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #ffffff;
+    cursor: pointer;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-family: 'Space Mono', monospace;
+    box-shadow: 0 8px 32px rgba(233,69,96,0.45);
+    position: relative;
+    z-index: 1;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+
+  #start-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(233,69,96,0.6);
+  }
+
+  .footer-tag {
+    margin-top: 48px;
+    font-size: 8px;
+    color: rgba(255,255,255,0.1);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 1;
+  }
+
+  #chat-view {
+    display: none;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  .chat-header {
+    background: linear-gradient(135deg, #f5a623, #e94560);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  .header-orb {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .header-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1;
+    padding: 3px;
+  }
+
+  .header-logo span {
+    font-family: 'Bebas Neue', sans-serif;
+    color: #ffffff;
+    display: block;
+    letter-spacing: 0.5px;
+  }
+
+  .header-logo .the   { font-size: 7px; }
+  .header-logo .dj    { font-size: 11px; }
+  .header-logo .skool { font-size: 7px; }
+
+  .header-title {
+    font-family: Georgia, serif;
+    font-size: 17px;
+    color: #000;
+  }
+
+  .header-sub {
+    font-size: 8px;
+    color: rgba(0,0,0,0.45);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .live-indicator {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 9px;
+    color: rgba(0,0,0,0.45);
+    letter-spacing: 1px;
+  }
+
+  .live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #7bed9f;
+    animation: livePulse 2s infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes livePulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.35; }
+  }
+
+  #messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.08) transparent;
+  }
+
+  .msg-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+  }
+
+  .msg-row.user { justify-content: flex-end; }
+
+  .msg-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f5a623, #e94560);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .avatar-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1;
+    padding: 2px;
+  }
+
+  .avatar-logo span {
+    font-family: 'Bebas Neue', sans-serif;
+    color: #ffffff;
+    display: block;
+    letter-spacing: 0.5px;
+  }
+
+  .avatar-logo .the   { font-size: 6px; }
+  .avatar-logo .dj    { font-size: 10px; }
+  .avatar-logo .skool { font-size: 6px; }
+
+  .bubble {
+    max-width: 76%;
+    padding: 12px 16px;
+    font-size: 13px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  .bubble.ai {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 18px 18px 18px 4px;
+    color: rgba(255,255,255,0.85);
+  }
+
+  .bubble.user {
+    background: linear-gradient(135deg, #f5a623, #e94560);
+    border-radius: 18px 18px 4px 18px;
+    color: #000000;
+    font-weight: 700;
+  }
+
+  .typing-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+  }
+
+  .typing-bubble {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 18px 18px 18px 4px;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .typing-dots {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+
+  .typing-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #f5a623;
+    animation: tdot 1.2s ease-in-out infinite;
+  }
+
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes tdot {
+    0%, 80%, 100% { transform: translateY(0); }
+    40%           { transform: translateY(-7px); }
+  }
+
+  .typing-status {
+    font-size: 9px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 1px;
+    min-height: 12px;
+  }
+
+  .input-area {
+    border-top: 1px solid rgba(255,255,255,0.08);
+    background: #0d0d1a;
+    padding: 12px 16px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    flex-shrink: 0;
+  }
+
+  #msg-input {
+    flex: 1;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 20px;
+    padding: 12px 16px;
+    color: #fff;
+    font-size: 13px;
+    font-family: 'Space Mono', monospace;
+    resize: none;
+    outline: none;
+    line-height: 1.5;
+    max-height: 120px;
+    overflow-y: auto;
+  }
+
+  #msg-input::placeholder { color: rgba(255,255,255,0.25); }
+
+  #send-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #f5a623, #e94560);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+    color: #ffffff;
+    box-shadow: 0 4px 16px rgba(245,166,35,0.4);
+    transition: transform 0.15s, opacity 0.15s;
+  }
+
+  #send-btn:disabled {
+    opacity: 0.3;
+    cursor: default;
+    transform: none;
+    box-shadow: none;
+  }
+
+  #send-btn:not(:disabled):hover { transform: scale(1.08); }
+
+  .chat-footer {
+    text-align: center;
+    padding: 6px 0 10px;
+    font-size: 8px;
+    color: rgba(255,255,255,0.1);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    background: #0d0d1a;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+  <!-- LANDING -->
+  <div id="landing">
+    <div class="grid-lines"></div>
+    <div class="orb">
+      <div class="orb-logo">
+        <span class="the">THE</span>
+        <span class="dj">DJ</span>
+        <span class="skool">SKOOL</span>
+      </div>
+    </div>
+    <div class="eyebrow">DJ Skool · GTE Event Group</div>
+    <h1 class="headline">AI Set Builder</h1>
+    <p class="sub">Tell us what music you love and we'll help you build your very first DJ set — with real songs, real reasons, and a flow that actually works.</p>
+    <button id="start-btn" onclick="startChat()">Build My Set →</button>
+    <div class="footer-tag">Powered by GTE Event Group · Fig Garden, Fresno</div>
+  </div>
+
+  <!-- CHAT -->
+  <div id="chat-view">
+    <div class="chat-header">
+      <div class="header-orb">
+        <div class="header-logo">
+          <span class="the">THE</span>
+          <span class="dj">DJ</span>
+          <span class="skool">SKOOL</span>
+        </div>
+      </div>
+      <div>
+        <div class="header-title">DJ Skool Set Builder</div>
+        <div class="header-sub">Powered by GTE Event Group</div>
+      </div>
+      <div class="live-indicator">
+        <div class="live-dot"></div>
+        LIVE
+      </div>
+    </div>
+
+    <div id="messages"></div>
+
+    <div class="input-area">
+      <textarea id="msg-input" rows="1" placeholder="Tell me what music you love..."></textarea>
+      <button id="send-btn" onclick="sendMessage()">▶</button>
+    </div>
+    <div class="chat-footer">DJ Skool · GTE Event Group · Fig Garden, Fresno</div>
+  </div>
+
+<script>
+const ANTHROPIC_API_KEY = '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';
+
+const OPENING_MESSAGE = `What's up! Welcome to The DJ Skool — I'm your Set Builder, and I'm here to help you put together your very first DJ Set 🎧
+
+No experience needed, no wrong answers — we're just gonna start with what YOU love. So tell me: what artists or genres are you really feeling right now? Could be hip-hop, reggaeton, EDM, pop, R&B, cumbia, anything — if it makes you move, I want to hear it.`;
+
+const SYSTEM_PROMPT_CONVO = `You are the DJ Skool Set Builder — a friendly, encouraging AI music guide created for DJ Skool at GTE Event Group in Fresno, CA. Your job is to help beginner DJ students (teens and adults with zero experience) build their very first DJ set.
+
+Your personality:
+- Encouraging, fun, and cool — never condescending
+- You talk like a knowledgeable friend, not a textbook
+- You celebrate every choice the student makes
+- Short responses — 2-4 sentences max per message
+- Never list songs yet — that comes at the end
+
+You are currently on a specific step. Follow ONLY the instruction for your current step:
+
+STEP q1 — The student just told you their favorite artists or genres. React with genuine excitement to exactly what they said, then ask ONLY this one question:
+"Now, let me ask you this: what kind of energy do you want your set to have? Are you thinking hype and high energy, chill and smooth, or a mix that builds from mellow to bigger as it goes?"
+
+STEP q2 — The student told you their energy preference. React uniquely to what they said, then ask ONLY this one question (tailor the examples to their vibe):
+"Is there a specific moment or feeling you want people to have during your set — like a [relevant example] or [another relevant example]? Paint me a picture!"
+
+STEP q3 — The student painted you a picture. React warmly, confirm you have everything you need, tell them you are building their set now, then end with exactly this token and nothing else after it: [READY_TO_BUILD]
+
+CRITICAL RULES:
+- Ask ONLY ONE question per response — never repeat a question already asked
+- Do NOT suggest any songs at any step
+- React specifically to what the student actually said — never generic
+- Keep it conversational and warm`;
+
+const SYSTEM_PROMPT_SONGS = `You are an experienced DJ and music curator finishing a set for a beginner DJ student at GTE Event Group in Fresno, CA.
+
+You've collected their answers: favorite artists/genres, desired energy, and the feeling they want to create. Think like a DJ — not a playlist generator.
+
+Build 10-12 tracks that FLOW together as a real set:
+- Songs share compatible BPM (within 5% of each other for smooth mixing)
+- The energy arc makes sense — they take the listener on a journey
+- The tracks genuinely sound good played back to back
+- 2-3 tracks can reference their inspiration artists; the rest should be carefully chosen songs from the same genre, era, or sonic world that serve the overall vibe
+- Think about key compatibility, tempo, mood, and texture
+- A great set surprises the listener with something they didn't know they needed
+
+REAL SONGS ONLY — only include songs you are fully confident exist. Never make up titles.
+
+CRITICAL FORMATTING RULES:
+- Do NOT include any section called "Here's what I confirmed" or "Search results" or any summary
+- Go straight from your opener to the numbered track list
+
+Format your response EXACTLY like this:
+
+[One warm sentence opener]
+
+Your Set (10-12 tracks):
+
+1. "Song Title" - Artist (~BPM BPM) — [one punchy sentence]
+2. "Song Title" - Artist (~BPM BPM) — [one punchy sentence]
+3. "Song Title" - Artist (~BPM BPM) — [one punchy sentence]
+4. "Song Title" - Artist (~BPM BPM) — [one punchy sentence]
+5. "Song Title" - Artist (~BPM BPM) — [one punchy sentence]
+6. "Song Title" - Artist (~BPM BPM) — [one punchy sentence]
+7. "Song Title" - Artist (~BPM BPM) — [one punchy sentence]
+8. "Song Title" - Artist (~BPM BPM) — [one punchy sentence]
+9. "Song Title" - Artist (~BPM BPM) — [one punchy sentence]
+10. "Song Title" - Artist (~BPM BPM) — [one punchy sentence]
+11. "Song Title" - Artist (~BPM BPM) — [one punchy sentence — optional]
+12. "Song Title" - Artist (~BPM BPM) — [one punchy sentence — optional]
+
+Serato will show you the numbers, but trust your ears too — the numbers are just a guide!
+
+This is YOUR set — swap anything that doesn't feel right to you. How does that feel?`;
+
+const SYSTEM_PROMPT_FEEDBACK = `You are the DJ Skool Set Builder — an experienced DJ and music curator at GTE Event Group in Fresno, CA.
+
+You just delivered a 10-12 track set recommendation to a beginner DJ student. They are now giving you feedback — either pushing back on specific tracks, saying they don't like certain songs, or asking for alternatives.
+
+Your response MUST follow this exact two-part structure:
+
+PART 1 — EXPLAIN YOUR REASONING (2-4 sentences):
+Before offering any replacements, explain WHY you picked the tracks they're questioning. Talk about the BPM compatibility, the energy arc, the sonic vibe, how those tracks connect to the ones around them. Help them understand the DJ logic behind the selection — this is a teaching moment.
+
+PART 2 — OFFER ALTERNATIVES:
+Then offer 2-3 replacement tracks that would work just as well in the set. For each one use the same tight format:
+"Song Title" - Artist (~BPM BPM) — [one punchy sentence explaining why it's a good swap]
+
+Keep your tone warm, encouraging, and educational — like a knowledgeable big brother explaining his thinking. Never be defensive. Make them feel like they're learning something.`;
+
+let messages = [];
+let loading = false;
+let stage = 'q1';
+let answers = { genres: '', energy: '', feeling: '' };
+let typingStatusEl = null;
+
+const messagesEl = document.getElementById('messages');
+const inputEl    = document.getElementById('msg-input');
+const sendBtn    = document.getElementById('send-btn');
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+inputEl.addEventListener('input', () => {
+  inputEl.style.height = 'auto';
+  inputEl.style.height = Math.min(inputEl.scrollHeight, 120) + 'px';
+});
+
+inputEl.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+});
+
+function scrollBottom() {
+  setTimeout(() => messagesEl.scrollTop = messagesEl.scrollHeight, 50);
+}
+
+function makeAvatar() {
+  const av = document.createElement('div');
+  av.className = 'msg-avatar';
+  av.innerHTML = `<div class="avatar-logo">
+    <span class="the">THE</span>
+    <span class="dj">DJ</span>
+    <span class="skool">SKOOL</span>
+  </div>`;
+  return av;
+}
+
+function renderMessage(role, content) {
+  const row = document.createElement('div');
+  row.className = 'msg-row' + (role === 'user' ? ' user' : '');
+  if (role === 'assistant') row.appendChild(makeAvatar());
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble ' + (role === 'user' ? 'user' : 'ai');
+  bubble.textContent = content.replace('[READY_TO_BUILD]', '').trim();
+  row.appendChild(bubble);
+  messagesEl.appendChild(row);
+  scrollBottom();
+}
+
+function showTyping(statusText) {
+  hideTyping();
+  const row = document.createElement('div');
+  row.className = 'typing-row';
+  row.id = 'typing-indicator';
+  row.appendChild(makeAvatar());
+  const bubble = document.createElement('div');
+  bubble.className = 'typing-bubble';
+  const dots = document.createElement('div');
+  dots.className = 'typing-dots';
+  dots.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+  const statusDiv = document.createElement('div');
+  statusDiv.className = 'typing-status';
+  statusDiv.textContent = statusText || '';
+  typingStatusEl = statusDiv;
+  bubble.appendChild(dots);
+  bubble.appendChild(statusDiv);
+  row.appendChild(bubble);
+  messagesEl.appendChild(row);
+  scrollBottom();
+}
+
+function updateTypingStatus(text) {
+  if (typingStatusEl) typingStatusEl.textContent = text;
+}
+
+function hideTyping() {
+  const t = document.getElementById('typing-indicator');
+  if (t) t.remove();
+  typingStatusEl = null;
+}
+
+async function callClaude(systemPrompt, msgs, maxTokens, attempt) {
+  attempt = attempt || 1;
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: maxTokens || 800,
+        system: systemPrompt,
+        messages: msgs
+      })
+    });
+    if (!res.ok) throw new Error('Status ' + res.status);
+    const d = await res.json();
+    return (d.content || []).map(b => b.text || '').join('');
+  } catch(e) {
+    if (attempt < 3) {
+      updateTypingStatus(attempt === 1 ? 'still thinking...' : 'almost there...');
+      await sleep(attempt === 1 ? 2000 : 4000);
+      return callClaude(systemPrompt, msgs, maxTokens, attempt + 1);
+    }
+    throw e;
+  }
+}
+
+function startChat() {
+  document.getElementById('landing').style.display = 'none';
+  const chatView = document.getElementById('chat-view');
+  chatView.style.display = 'flex';
+  messages = [{ role: 'assistant', content: OPENING_MESSAGE }];
+  renderMessage('assistant', OPENING_MESSAGE);
+  stage = 'q1';
+  inputEl.focus();
+}
+
+async function sendMessage() {
+  const text = inputEl.value.trim();
+  if (!text || loading) return;
+
+  loading = true;
+  sendBtn.disabled = true;
+  inputEl.value = '';
+  inputEl.style.height = 'auto';
+
+  if (stage === 'q1')      answers.genres = text;
+  else if (stage === 'q2') answers.energy = text;
+  else if (stage === 'q3') answers.feeling = text;
+
+  const currentStage = stage;
+
+  if (stage === 'q1')      stage = 'q2';
+  else if (stage === 'q2') stage = 'q3';
+  else if (stage === 'q3') stage = 'building';
+
+  messages.push({ role: 'user', content: text });
+  renderMessage('user', text);
+
+  try {
+    if (currentStage === 'q1' || currentStage === 'q2') {
+      showTyping('thinking...');
+      const stagePrompt = SYSTEM_PROMPT_CONVO.replace(
+        'You are currently on a specific step.',
+        `You are currently on step ${currentStage}.`
+      );
+      const reply = await callClaude(stagePrompt, messages, 400);
+      const clean = reply.replace('[READY_TO_BUILD]', '').trim();
+      messages.push({ role: 'assistant', content: clean });
+      hideTyping();
+      renderMessage('assistant', clean);
+
+    } else if (currentStage === 'q3') {
+      showTyping('thinking...');
+      const stagePrompt = SYSTEM_PROMPT_CONVO.replace(
+        'You are currently on a specific step.',
+        `You are currently on step ${currentStage}.`
+      );
+      const confirm = await callClaude(stagePrompt, messages, 400);
+      const clean = confirm.replace('[READY_TO_BUILD]', '').trim();
+      messages.push({ role: 'assistant', content: clean });
+      hideTyping();
+      renderMessage('assistant', clean);
+
+      await sleep(300);
+      showTyping('building your set...');
+      const ctx = `Student preferences:\n- Genres/Artists: ${answers.genres}\n- Energy: ${answers.energy}\n- Feeling/moment: ${answers.feeling}\n\nThink like a DJ. Build a 10-12 track set that flows together. Go straight to the numbered list.`;
+      const songs = await callClaude(SYSTEM_PROMPT_SONGS, [{ role: 'user', content: ctx }], 1200);
+      messages.push({ role: 'assistant', content: songs });
+      hideTyping();
+      renderMessage('assistant', songs);
+      stage = 'done';
+
+    } else {
+      showTyping('thinking about your feedback...');
+      const reply = await callClaude(SYSTEM_PROMPT_FEEDBACK, messages, 600);
+      messages.push({ role: 'assistant', content: reply });
+      hideTyping();
+      renderMessage('assistant', reply);
+    }
+  } catch(e) {
+    console.error(e);
+    hideTyping();
+    renderMessage('assistant', "Having trouble connecting — try sending your message one more time!");
+    messages.pop();
+    if (stage === 'q2')            stage = 'q1';
+    else if (stage === 'q3')       stage = 'q2';
+    else if (stage === 'building') stage = 'q3';
+  }
+
+  loading = false;
+  sendBtn.disabled = false;
+  inputEl.focus();
+}
+</script>
+</body>
+</html>
