@@ -415,7 +415,6 @@
 </head>
 <body>
 
-  <!-- LANDING -->
   <div id="landing">
     <div class="grid-lines"></div>
     <div class="orb">
@@ -432,7 +431,6 @@
     <div class="footer-tag">Powered by GTE Event Group · Fig Garden, Fresno</div>
   </div>
 
-  <!-- CHAT -->
   <div id="chat-view">
     <div class="chat-header">
       <div class="header-orb">
@@ -462,6 +460,7 @@
   </div>
 
 <script>
+// All API calls go through Google Apps Script — no key in this file
 const PROXY_URL = 'https://script.google.com/macros/s/AKfycbwnqHBGp8vdY1JFHSWR2cl5SFuMUjuZbJQoE3DNSXqgrvZmPVAQHPP_TbJWHflyNfo8/exec';
 
 const OPENING_MESSAGE = `What's up! Welcome to The DJ Skool — I'm your Set Builder, and I'm here to help you put together your very first DJ Set 🎧
@@ -632,14 +631,9 @@ function hideTyping() {
 async function callClaude(systemPrompt, msgs, maxTokens, attempt) {
   attempt = attempt || 1;
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch(PROXY_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
+      headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
         max_tokens: maxTokens || 800,
@@ -720,7 +714,7 @@ async function sendMessage() {
       await sleep(300);
       showTyping('building your set...');
       const ctx = `Student preferences:\n- Genres/Artists: ${answers.genres}\n- Energy: ${answers.energy}\n- Feeling/moment: ${answers.feeling}\n\nThink like a DJ. Build a 10-12 track set that flows together. Go straight to the numbered list.`;
-      const songs = await callClaude(SYSTEM_PROMPT_SONGS, [{ role: 'user', content: ctx }], 1200);
+      const songs = await callClaude(SYSTEM_PROMPT_SONGS, [{ role: 'user', content: ctx }], 1000);
       messages.push({ role: 'assistant', content: songs });
       hideTyping();
       renderMessage('assistant', songs);
