@@ -467,7 +467,7 @@
 
 <script>
 // All API calls go through Google Apps Script — no key in this file
-const PROXY_URL = 'https://script.google.com/macros/s/AKfycbznIuUqcx0BKtJQtzEovVgMk_K2ZUhfDDImih5TdHXp6tsZ-3hU967jr5tnFdadwPbk/exec';
+const PROXY_URL = 'https://script.google.com/macros/s/AKfycbxOqW0kB1rfSFskqRrBqIyswG0BN7qHZMDIyIyzACJAQqdLK4kJ6ZDDXb8INqB2gPCo/exec';
 
 const OPENING_MESSAGE = `What's up! Welcome to The DJ Skool — I'm your Set Builder, and I'm here to help you put together your very first DJ Set 🎧
 
@@ -503,16 +503,16 @@ const SYSTEM_PROMPT_SONGS = `You are an experienced DJ and music curator finishi
 You've collected their answers: favorite artists/genres, desired energy, and the feeling they want to create. Think like a DJ — not a playlist generator.
 
 BEFORE YOU WRITE ANYTHING: Plan your full 10-12 track set internally first. Follow this exact process:
-1. Choose your opening song and search for its exact BPM
-2. Choose song 2 — search for its BPM and confirm it is within 5 BPM of song 1. If it isn't, pick a different song.
-3. Continue track by track — search each song's BPM and confirm it is within 5 BPM of the previous one
-4. Pay special attention to tracks 1-2 and tracks 9-12 where most BPM mistakes happen
+1. Choose your opening song
+2. Choose song 2 — make sure it flows naturally from song 1 in tempo and feel. If it doesn't, pick a different song.
+3. Continue track by track — each new song must flow naturally from the previous one with no jarring tempo jumps
+4. Pay special attention to tracks 1-2 and tracks 9-12 where flow mistakes happen most
 5. Every track must be ONE real song by ONE real artist — never combine two songs or reimagine one song as another
 6. Only start writing when your complete verified list is ready
 7. Never show your thinking, planning, corrections, or recalibrations — the student only sees the final polished list
 
-BPM RULE — NON-NEGOTIABLE:
-Each song must be within 5 BPM of the song directly before and after it. Use only the song's actual BPM — never use halftime, double-time, or "feel" adjustments to justify a track. If a song's real BPM doesn't fit within 5 BPM of the previous track, choose a different song. No exceptions.
+FLOW RULE — NON-NEGOTIABLE:
+Each song must flow naturally into the next. The set can build energy gradually but every transition must feel smooth. No jarring tempo jumps. If a song doesn't connect smoothly to the previous one, choose a different song.
 
 OTHER RULES:
 - The energy arc makes sense — they take the listener on a journey
@@ -533,20 +533,18 @@ Format your response EXACTLY like this:
 
 Your Set (10-12 tracks):
 
-1. "Song Title" - Artist (~BPM BPM) — [one punchy sentence]
-2. "Song Title" - Artist (~BPM BPM) — [one punchy sentence]
-3. "Song Title" - Artist (~BPM BPM) — [one punchy sentence]
-4. "Song Title" - Artist (~BPM BPM) — [one punchy sentence]
-5. "Song Title" - Artist (~BPM BPM) — [one punchy sentence]
-6. "Song Title" - Artist (~BPM BPM) — [one punchy sentence]
-7. "Song Title" - Artist (~BPM BPM) — [one punchy sentence]
-8. "Song Title" - Artist (~BPM BPM) — [one punchy sentence]
-9. "Song Title" - Artist (~BPM BPM) — [one punchy sentence]
-10. "Song Title" - Artist (~BPM BPM) — [one punchy sentence]
-11. "Song Title" - Artist (~BPM BPM) — [one punchy sentence — optional]
-12. "Song Title" - Artist (~BPM BPM) — [one punchy sentence — optional]
-
-Serato will show you the numbers, but trust your ears too — the numbers are just a guide!
+1. "Song Title" - Artist — [one punchy sentence]
+2. "Song Title" - Artist — [one punchy sentence]
+3. "Song Title" - Artist — [one punchy sentence]
+4. "Song Title" - Artist — [one punchy sentence]
+5. "Song Title" - Artist — [one punchy sentence]
+6. "Song Title" - Artist — [one punchy sentence]
+7. "Song Title" - Artist — [one punchy sentence]
+8. "Song Title" - Artist — [one punchy sentence]
+9. "Song Title" - Artist — [one punchy sentence]
+10. "Song Title" - Artist — [one punchy sentence]
+11. "Song Title" - Artist — [one punchy sentence — optional]
+12. "Song Title" - Artist — [one punchy sentence — optional]
 
 This is YOUR set — swap anything that doesn't feel right to you. How does that feel?`;
 
@@ -557,11 +555,11 @@ You just delivered a 10-12 track set recommendation to a beginner DJ student. Th
 Your response MUST follow this exact two-part structure:
 
 PART 1 — EXPLAIN YOUR REASONING (2-4 sentences):
-Before offering any replacements, explain WHY you picked the tracks they're questioning. Talk about the BPM compatibility, the energy arc, the sonic vibe, how those tracks connect to the ones around them. Help them understand the DJ logic behind the selection — this is a teaching moment.
+Before offering any replacements, explain WHY you picked the tracks they're questioning. Talk about the energy arc, the sonic vibe, how those tracks connect to the ones around them, and why they flow well together. Help them understand the DJ logic behind the selection — this is a teaching moment.
 
 PART 2 — OFFER ALTERNATIVES:
 Then offer 2-3 replacement tracks that would work just as well in the set. For each one use the same tight format:
-"Song Title" - Artist (~BPM BPM) — [one punchy sentence explaining why it's a good swap]
+"Song Title" - Artist — [one punchy sentence explaining why it's a good swap]
 
 Keep your tone warm, encouraging, and educational — like a knowledgeable big brother explaining his thinking. Never be defensive. Make them feel like they're learning something.`;
 
@@ -671,46 +669,6 @@ async function callClaude(systemPrompt, msgs, maxTokens, attempt) {
   }
 }
 
-async function callClaudeWithSearch(systemPrompt, msgs, maxTokens, attempt) {
-  attempt = attempt || 1;
-  try {
-    const res = await fetch(PROXY_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: maxTokens || 1200,
-        system: systemPrompt,
-        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-        messages: msgs
-      })
-    });
-    if (!res.ok) throw new Error('Status ' + res.status);
-    const d = await res.json();
-    if (d.stop_reason === 'tool_use') {
-      updateTypingStatus('verifying BPMs...');
-      const results = (d.content || [])
-        .filter(b => b.type === 'tool_use')
-        .map(b => ({ type: 'tool_result', tool_use_id: b.id, content: 'Search completed.' }));
-      return callClaudeWithSearch(systemPrompt, [
-        ...msgs,
-        { role: 'assistant', content: d.content },
-        { role: 'user', content: results }
-      ], maxTokens, attempt);
-    }
-    let text = (d.content || []).map(b => b.text || '').join('');
-    text = text.replace(/here'?s what i (confirmed|found|verified|searched)[^\n]*/gi, '').trim();
-    return text;
-  } catch(e) {
-    if (attempt < 3) {
-      updateTypingStatus(attempt === 1 ? 'still searching...' : 'double checking...');
-      await sleep(attempt === 1 ? 3000 : 5000);
-      return callClaudeWithSearch(systemPrompt, msgs, maxTokens, attempt + 1);
-    }
-    throw e;
-  }
-}
-
 function startChat() {
   document.getElementById('landing').style.display = 'none';
   const chatView = document.getElementById('chat-view');
@@ -772,7 +730,7 @@ async function sendMessage() {
       await sleep(300);
       showTyping('building your set...');
       const ctx = `Student preferences:\n- Genres/Artists: ${answers.genres}\n- Energy: ${answers.energy}\n- Feeling/moment: ${answers.feeling}\n\nThink like a DJ. Build a 10-12 track set that flows together. Go straight to the numbered list.`;
-      const songs = await callClaudeWithSearch(SYSTEM_PROMPT_SONGS, [{ role: 'user', content: ctx }], 1200);
+      const songs = await callClaude(SYSTEM_PROMPT_SONGS, [{ role: 'user', content: ctx }], 1200);
       messages.push({ role: 'assistant', content: songs });
       hideTyping();
       renderMessage('assistant', songs);
