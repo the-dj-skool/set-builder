@@ -353,10 +353,14 @@
     border-top: 1px solid rgba(255,255,255,0.08);
     background: #0d0d1a;
     padding: 12px 16px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
     display: flex;
     gap: 10px;
     align-items: flex-end;
     flex-shrink: 0;
+    position: sticky;
+    bottom: 0;
+    z-index: 100;
   }
 
   #msg-input {
